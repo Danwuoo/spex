@@ -1,16 +1,14 @@
 # PROJECT STATE
 
-**State version:** v0.2  
+**State version:** v0.3  
 **Last updated:** 2026-08-01  
-**State basis:** `Problem Definition v1.md`, `Evidence-Base-v1.1.xlsx`, `Evidence-Adjudication-v1.xlsx`, `Evidence-Adjudication-v1.md`, `ARC-Eval-Definition-v0.md`，以及 `Danwuoo/spex@676dbdfd4856cf373349afe0106730b1a58fb42f` 的 `docs/` repository snapshot  
+**State basis:** `Problem Definition v1.md`, `Evidence-Base-v1.1.xlsx`, `Evidence-Adjudication-v1.xlsx`, `Evidence-Adjudication-v1.md`, `ARC-Eval-Definition-v0.md`  
 **Evidence cutoff:** Evidence Base v1.1 / Evidence Adjudication v1；ARC external-source snapshot accessed through 2026-07-31  
 **Document role:** 專案入口、狀態索引與讀取路由。它不取代任何上位定義、證據記錄、裁決或 evaluation specification。  
-**Current lifecycle:** Problem definition stabilized → evidence adjudicated → ARC-specific evaluation specification drafted → repository integration incomplete → implementation evidence not yet present in the provided authoritative artifacts  
+**Current lifecycle:** Problem definition stabilized → evidence adjudicated → ARC-specific evaluation specification drafted → ARC-AGI-1 pre-implementation setup  
 **Current operational stage:** ARC-AGI-1 pre-implementation setup。這是依 ARC 執行順序與目前附件缺少 run artifacts 所作的狀態推定，不是已達成的 stage status。  
 **Global experiment-design readiness:** `Not ready`（Evidence Adjudication v1）  
 **ARC-specific design readiness:** `Draft for implementation`（ARC Evaluation Definition v0.1，2026-07-31）  
-**Code / document repository:** `Danwuoo/spex`（private；default branch `main`）  
-**Repository snapshot used by this state:** `676dbdfd4856cf373349afe0106730b1a58fb42f`（2026-07-30；`Organize documentation structure`）  
 **Project owner / decision authority:** `TBD`  
 **State maintainer:** `TBD`  
 
@@ -28,8 +26,6 @@
 
 遇到本檔與來源文件不一致時，以來源文件為準，並更新本檔；不得用本檔覆寫 evidence record、decision record 或上位 problem definition。
 
-涉及 repository file location、branch、commit、artifact presence 或文件是否已整合到 `main` 時，必須以 GitHub repository snapshot 為準；本檔只記錄上方 pinned snapshot 的狀態。附件存在不等於該 artifact 已進入 repository，repository 中存在歷史檔也不等於它具有 current authority。
-
 ---
 
 ## 1. Current authoritative artifacts
@@ -40,8 +36,8 @@
 | Record-level evidence repository | [`Evidence-Base-v1.1.xlsx`](./Evidence-Base-v1.1.xlsx) | v1.1 | 保存 Evidence、Source、Benchmark、Claim、Counterexample、Gap、Definition、Verification 與 Change records。 |
 | Current claim adjudication | [`Evidence-Adjudication-v1.xlsx`](./Evidence-Adjudication-v1.xlsx) | v1 | 保存 claim、counterexample、contradiction、boundary condition、gap、problem-definition impact 與 decision log 的結構化裁決。 |
 | Human-readable adjudication summary | [`Evidence-Adjudication-v1.md`](./Evidence-Adjudication-v1.md) | v1 | 提供 DR2 後的裁決摘要、claim-level interpretation、remaining gaps 與 readiness assessment。 |
-| Current domain evaluation program | `ARC-Eval-Definition-v0.md` | v0.1 / Draft for implementation / 2026-07-31 / repository integration pending | 定義 ARC-AGI-1 → 2 → 3 的研究與工程評估規格；受 Problem Definition v1 約束。該附件不在 pinned `main` snapshot，不能假定 repo 使用者可取得。 |
-| Project state index | `docs/current/PROJECT-STATE.md` | v0.2 / repository integration pending | 提供狀態與讀取路由；不具有獨立 empirical authority。Pinned `main` 尚無此檔。 |
+| Current domain evaluation program | `ARC-Eval-Definition-v0.md` | v0.1 / Draft for implementation / 2026-07-31 | 定義 ARC-AGI-1 → 2 → 3 的研究與工程評估規格；受 Problem Definition v1 約束。 |
+| Project state index | `docs/current/PROJECT-STATE.md` | v0.3 | 提供狀態與讀取路由；不具有獨立 empirical authority。 |
 
 ### 1.1 Authority resolution
 
@@ -60,35 +56,6 @@
 - 下位文件與上位文件衝突時，不自行調和；記錄 conflict，新增 decision record，必要時升級上位文件版本。
 - 新 evidence 不能只在本檔改變 claim status；必須先進入 Evidence Base / Verification Log，再由 Evidence Adjudication 裁決。
 - 合理解釋不等於 empirical resolution。未有 discriminating evidence 時，contradiction 仍維持 unresolved、measurement issue、boundary condition 或 temporal issue。
-
-### 1.3 Repository snapshot and document topology
-
-**Source-stated（GitHub）：** 本檔檢查的 repository 是 private `Danwuoo/spex`，default branch 為 `main`；snapshot pin 為 `676dbdfd4856cf373349afe0106730b1a58fb42f`。該 commit 的文件組織如下：
-
-| Repository area | Artifacts in the pinned snapshot | Governance role |
-|---|---|---|
-| `docs/current/` | `Problem Definition v1.md`、`Evidence-Base-v1.1.xlsx`、`Evidence-Adjudication-v1.xlsx`、`Evidence-Adjudication-v1.md` | Current-project definition、record-level evidence 與 adjudication。只有符合文件角色與 current status 的檔案具有現行權威。 |
-| `docs/research/round-1/` | `deep-research-report.md` | Round 1 research input；可追溯來源與先前 synthesis，不可直接覆寫 current adjudication。 |
-| `docs/research/round-2/` | `DR2-report.md` | DR2 primary-source verification / discriminating research input；其已裁決結論以 current Evidence Adjudication 為準。 |
-| `docs/archive/contradiction-map/v1/` | `Contradiction Map v1.md`、`Contradiction Map v1.xlsx` | Historical contradiction analysis；可追溯 K-record 的前期形成，不得取代 DR2 後 adjudication。 |
-| `docs/archive/evidence-base/v1/` | `Evidence-Base-v1.xlsx`、`Evidence-Base-v1-README.md`、`Evidence-Base-v1-QA-Report.md` | Superseded evidence-base snapshot、schema notes 與 QA provenance；不得填補 v1.1 / adjudication 中的 Unknown。 |
-
-Repository root 在 pinned snapshot 沒有 `README.md`；因此本檔若被整合，應放在 `docs/current/PROJECT-STATE.md`，並作為 repository 的 project-state entrypoint。是否另外建立 root README / pointer 為 `TBD`，不由本檔自動決定。
-
-### 1.4 Artifact identity and integration status
-
-下表只證明附件與 pinned repository blob 的 byte identity，不提升任何 empirical claim：
-
-| Artifact | GitHub path | Blob SHA | Attachment vs repository |
-|---|---|---|---|
-| Problem Definition v1 | `docs/current/Problem Definition v1.md` | `0d60d4bc0537c70a78c6dc461134fab1e6fd4b9b` | Exact match |
-| Evidence Base v1.1 | `docs/current/Evidence-Base-v1.1.xlsx` | `2191668fcd747e7bacb062a22eba6a51ba497094` | Exact match |
-| Evidence Adjudication v1 workbook | `docs/current/Evidence-Adjudication-v1.xlsx` | `3f98e88b3c736c2ee02677633f02403de533d729` | Exact match |
-| Evidence Adjudication v1 summary | `docs/current/Evidence-Adjudication-v1.md` | `181ecec1249e724cdfea6a8cd76e0f935a022391` | Exact match |
-| ARC Evaluation Definition v0 | Not present in pinned `main` | `N/A` | Attachment only / repository integration pending |
-| PROJECT STATE v0.2 | Not present in pinned `main` | `N/A` | Current revision / repository integration pending |
-
-**State inference：** 目前「專案內容狀態」領先於 `main` 的「repository integration state」。在 ARC Evaluation Definition 與本檔進入 repo 並完成 path / link validation 前，不得把 `main` 描述成包含完整 current project state。
 
 ---
 
@@ -126,7 +93,6 @@ ARC 是第一個受控案例域，不是整個研究問題。ARC-only 結果不�
 | Competing hypothesis formation | Ready with conditions | 可建立相互競爭的機制假說，但必須保留 G0004、G0007 等 blockers。 |
 | Global experiment design | Not ready | matched comparator、private coding tasks、point-in-time finance data、inference budget 與 generalization thresholds 未完成。 |
 | ARC-specific evaluation specification | Draft for implementation | 已建立可工作的 domain spec，但有 10 項 implementation TBD，且尚未達 v1 acceptance criteria。 |
-| Repository integration | Incomplete | Pinned `main` 已包含 PD v1、EB v1.1 與 EA v1，但尚未包含 ARC Eval v0 與 PROJECT STATE；repo root 亦無 README pointer。 |
 | ARC runs / stage achievements | Not evidenced | 目前提供的 authoritative artifacts 中沒有正式 preregistration、run manifest、official score 或 stage-completion record。 |
 
 ---
@@ -622,8 +588,7 @@ result_status:
 
 - project owner / final decision authority
 - state maintainer
-- protected-branch policy（repository 已定位為 `Danwuoo/spex`；default branch 是 `main`，但 protection status 未由 current artifacts 決定）
-- implementation code location（pinned `docs/` snapshot 只建立文件治理；不能由此推定 solver / evaluator code 已存在或位於何處）
+- implementation code location
 - experiment registry location
 - artifact storage and retention policy
 - sealed-data custodian
@@ -696,7 +661,6 @@ ARC Evaluation Definition v0 可升級為 v1，至少需要：
 
 | Work item | Status | Blocks |
 |---|---|---|
-| Integrate `PROJECT-STATE.md` and `ARC-Eval-Definition-v0.md` into a reviewed current-doc path | Open | Unified repository entrypoint / path-valid source routing |
 | A1 repository/evaluator/data snapshot freeze | Open | 所有正式 A1 runs |
 | Sealed validation design and custodian | TBD | Generalization / verified completion |
 | Compute-tier calibration | TBD | Matched-resource claims |
@@ -792,7 +756,6 @@ Decision record 至少需要：
 
 | Task | Read first | Read next only if needed | Do not assume |
 |---|---|---|---|
-| Repository topology / artifact availability | `PROJECT-STATE.md` §1.3–1.4 + pinned GitHub snapshot | Relevant commit / exact file path | 附件存在不等於已進入 `main`；archive presence 不等於 current authority |
 | 目前研究問題 / shortest statement | `PROJECT-STATE.md` §2 + `Problem Definition v1` §2–3 | PD §8–10 | 不從 legacy 文件重建問題 |
 | 術語 / unit / advantage / capability construct | PD §4–6 | Evidence Base `Definitions`, `Specialization_Taxonomy` | `specialist` 標籤本身不代表 superiority |
 | Claim status | Adjudication `Claim_Adjudication` | Evidence Base `Claims`, `Evidence_Records`, `Verification_Log` | 不以單篇 paper 改寫 current status |
@@ -813,12 +776,6 @@ Decision record 至少需要：
 ---
 
 ## 21. Required project artifacts not yet evidenced
-
-先完成 repository-level current-document integration：
-
-- `docs/current/PROJECT-STATE.md`（本檔通過 review 後的 current copy）
-- `docs/current/ARC-Eval-Definition-v0.md`（或 decision record 核准的等價 canonical path）
-- optional root `README.md` / pointer（是否需要仍為 `TBD`）
 
 在開始可裁決的 ARC implementation 前，應建立或定位下列 artifacts：
 
@@ -855,12 +812,11 @@ Decision record 至少需要：
 8. Contamination、leakage、scorer discrepancy 或 resource asymmetry 被發現。
 9. External frontier update 使既有 contemporary claim 轉為 historical。
 10. Public statement / publication 被核准。
-11. Current artifacts 被新增、移動、重新命名或從 repository 移除，或 pinned `main` snapshot 改變。
+11. Current artifacts 被新增、移動、重新命名或移除。
 
 每次更新必須：
 
 - 修改 `Last updated` 與 `State version`；
-- 更新 repository、branch、pinned commit 與 artifact-integration status；
 - 更新 authoritative artifact table；
 - 更新受影響的 status、gap、decision、stage 與 next action；
 - 在 Change Log 新增一列；
@@ -876,9 +832,10 @@ Decision record 至少需要：
 |---|---|---|---|---|
 | 2026-08-01 | v0.1 | 建立完整專案狀態索引；整合 Problem Definition v1、Evidence Base v1.1、Evidence Adjudication v1 與 ARC Eval Definition v0。 | Current authoritative artifacts | All |
 | 2026-08-01 | v0.2 | 對齊 `spex/docs` repository topology；pin `main` snapshot；驗證四份 current attachments 與 repo blobs 一致；補入 current/research/archive roles、artifact integration gap、正確路徑與 repository-specific routing。未改變 empirical claim adjudication。 | `Danwuoo/spex@676dbdfd4856cf373349afe0106730b1a58fb42f` + v0.1 state basis | Metadata、§0–2、§15、§18、§20–24 |
+| 2026-08-01 | v0.3 | 將短期 repository snapshot、commit/blob identity 與 integration tracking 移出 PROJECT STATE；repository/Codex Work mode 規則改由 root `AGENTS.md` 管理。未改變 empirical claim adjudication、ARC stage status 或 research scope。 | Repository operating-model decision | Metadata、§0–2、§15、§18、§20–24 |
 
 ---
 
 ## 24. Current one-paragraph operational statement
 
-> 本專案目前已完成 empirical problem 的分層定義與 DR2 evidence adjudication，並將第一個受控 evaluation domain 定為 ARC-AGI-1 → ARC-AGI-2 → ARC-AGI-3。`Danwuoo/spex@676dbdf` 的 `docs/current` 已保存 PD v1、EB v1.1 與 EA v1，但尚未整合 ARC Eval v0 與本 PROJECT STATE，因此 repository entrypoint 仍不完整。現階段最合理的工作狀態是 ARC-AGI-1 pre-implementation setup：先完成 current-doc integration，再凍結 repository、evaluator、data governance、compute tiers 與 run manifest，並建立 fixed-backbone baseline ladder、component ablations、cost-quality curves 與 reproducibility package。任何結果都必須依 model/system/formal unit、capability construct、resource parity、data exposure、evaluator snapshot、private verification 與 time index 分級解讀；目前沒有來源支持任何 ARC stage 已達成，也不應選擇 winning hypothesis 或外推 cross-domain/AGI 結論。
+> 本專案目前已完成 empirical problem 的分層定義與 DR2 evidence adjudication，並將第一個受控 evaluation domain 定為 ARC-AGI-1 → ARC-AGI-2 → ARC-AGI-3。現階段最合理的工作狀態是 ARC-AGI-1 pre-implementation setup：先凍結 canonical repository、evaluator、data governance、compute tiers 與 run manifest，再建立 fixed-backbone baseline ladder、component ablations、cost-quality curves 與 reproducibility package。任何結果都必須依 model/system/formal unit、capability construct、resource parity、data exposure、evaluator snapshot、private verification 與 time index 分級解讀；目前沒有來源支持任何 ARC stage 已達成，也不應選擇 winning hypothesis 或外推 cross-domain/AGI 結論。Repository 與 Codex Work mode 操作規則由 root `AGENTS.md` 管理。
