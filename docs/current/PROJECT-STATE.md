@@ -1,11 +1,11 @@
 # PROJECT STATE
 
-- **State version:** v0.4
-- **Last updated:** 2026-08-02
+- **State version:** v0.5
+- **Last updated:** 2026-08-05
 - **Evidence cutoff:** Evidence Base v1.1 / Evidence Adjudication v1; ARC external-source snapshot through 2026-07-31
 - **Operational snapshot:** ARC dataset and Toolkit checks through 2026-08-02
-- **Document role:** Primary project entrypoint, high-value state record, and source router. It does not replace the Problem Definition, evidence records, adjudication, or ARC evaluation specification.
-- **Current lifecycle:** Problem definition stabilized → evidence adjudicated → ARC evaluation specification drafted → ARC-AGI-1 pre-implementation setup
+- **Document role:** Primary project entrypoint, high-value state record, and source router. It does not replace the Problem Definition, project/domain evaluation definitions, evidence records, or adjudication.
+- **Current lifecycle:** Problem definition stabilized → evidence adjudicated → project-level evaluation architecture drafted → ARC evaluation specification drafted → ARC-AGI-1 pre-implementation setup
 - **Current operational stage:** ARC-AGI-1 pre-implementation setup. Public A1/A2 data and the A3 Toolkit are locally available, but the canonical snapshot, evaluator, governance, and run infrastructure are not frozen.
 - **Global experiment-design readiness:** `Not ready`
 - **ARC-specific design readiness:** `Draft for implementation`
@@ -58,6 +58,7 @@ ARC is the first controlled evaluation domain, not the full research problem. AR
 | Problem Definition v1 | Current / ready with conditions | The empirical problem, taxonomy, minimum rules, and falsification conditions are defined. |
 | Evidence Base v1.1 | Current | Record-level evidence and provenance are available. |
 | Evidence Adjudication v1 | Current | Claims, counterexamples, contradictions, boundary conditions, gaps, and decisions are adjudicated. |
+| Project Evaluation Definition v0.1 | Draft for project-level evaluation architecture | Cross-domain evaluation, comparison, aggregation, evidence-downgrade, falsification, and domain-inheritance rules are defined; this does not make global experiment design ready. |
 | Global experiment design | Not ready | Comparator, private-task, temporal, resource, and generalization controls remain incomplete. |
 | ARC Evaluation Definition v0.1 | Draft for implementation | Working ARC program exists, with unresolved implementation decisions and unmet v1 gates. |
 | Local ARC data and Toolkit | Available for implementation setup | A1/A2 public data, A3 imports, local smoke test, and remote discovery were verified. |
@@ -82,6 +83,7 @@ Detailed records, status reasoning, counterexample scope, contradiction maps, an
 | Role | Current artifact | Authority |
 |---|---|---|
 | Empirical problem, scope, terminology, minimum claim rules, falsification | [Problem Definition v1](./Problem%20Definition%20v1.md) | Highest authority for the current research problem |
+| Cross-domain evaluation, comparison, aggregation, claim-decision rules, and domain inheritance | [Project Evaluation Definition v0](./Project-Evaluation-Definition-v0.md) | Project-level evaluation architecture between the Problem Definition and Domain Evaluation Definitions |
 | Record-level evidence, IDs, provenance, benchmark metadata, verification | [Evidence Base v1.1](./Evidence-Base-v1.1.xlsx) | Highest authority for record-level evidence fields |
 | Structured claim and gap adjudication, decision log | [Evidence Adjudication v1 workbook](./Evidence-Adjudication-v1.xlsx) | Highest authority for current adjudication status |
 | Human-readable adjudication and readiness summary | [Evidence Adjudication v1 summary](./Evidence-Adjudication-v1.md) | Readable summary; workbook controls exact structured status |
@@ -92,6 +94,7 @@ Detailed records, status reasoning, counterexample scope, contradiction maps, an
 ### 2.2 Authority rules
 
 - Research problem, terms, and extrapolation rules come from the Problem Definition.
+- Cross-domain evaluation, comparison, aggregation, downgrade, and domain-inheritance rules come from Project Evaluation Definition; it does not choose domain benchmarks, thresholds, or compute tiers.
 - Claim, counterexample, contradiction, boundary-condition, and gap status come from Evidence Adjudication.
 - Record IDs, provenance, benchmark metadata, and verification details come from the Evidence Base.
 - ARC metrics, data governance, run requirements, stages, and SOTA taxonomy come from ARC Evaluation Definition.
@@ -230,16 +233,18 @@ These are implementation requirements, not evidence that any stage has failed or
 |---|---|---|---|
 | Current status / shortest orientation | `PROJECT-STATE.md` §1 and §4 | Routed source for the specific question | State index has independent empirical authority |
 | Research problem / scope / falsification | [Problem Definition v1](./Problem%20Definition%20v1.md) §2–3, §7, §10 | PD §8–9 | Legacy framing is current |
-| Units / advantage / constructs / minimum rules | PD §4–6 | Evidence Base definitions | `specialist` implies superiority |
+| Project-wide evaluation / comparison / aggregation / claim decision | [Project Evaluation Definition v0](./Project-Evaluation-Definition-v0.md) §3–11 | PD §4–6, §10; Evidence Adjudication for current status | An operational rule is an empirical finding |
+| Units / advantage / constructs / minimum rules | Project Eval §4–8 | PD §4–6 | `specialist` implies superiority or one advantage implies another |
 | Claim status / counterexample / contradiction / boundary / gap | [Evidence Adjudication v1 summary](./Evidence-Adjudication-v1.md) §4–10 | Structured workbook, then relevant Evidence IDs | A plausible explanation resolves a contradiction |
 | Record IDs / provenance / benchmark metadata / verification | [Evidence Base v1.1](./Evidence-Base-v1.1.xlsx) | Adjudication workbook for current status | Repository presence establishes authority |
-| ARC design / metrics / governance / stage gate | [ARC Evaluation Definition v0](../eval/ARC-Eval-Definition-v0.md) | PD minimum rules and relevant adjudicated gaps | ARC-only supports cross-domain or AGI conclusions |
+| Create or revise a Domain Evaluation Definition | Project Eval §12–14 | PD and relevant adjudicated gaps; domain sources only as needed | Project Eval chooses the actual benchmark, threshold, or compute tier |
+| ARC design / metrics / governance / stage gate | [ARC Evaluation Definition v0](../eval/ARC-Eval-Definition-v0.md) | Project Eval inheritance contract; PD minimum rules and relevant adjudicated gaps | ARC-only supports cross-domain or AGI conclusions |
 | Dataset counts / Toolkit / environments / configuration / smoke test | [ARC Dataset and Toolkit Status v0](../eval/ARC-Dataset-Toolkit-Status-v0.md) | Actual code/data only when executing in the repository | Installation equals evaluator or stage validation |
 | A1 implementation | ARC Eval §6–9, §13–19 | Dataset/Toolkit status and new durable implementation artifacts | Current public data fills sealed/compute TBDs |
 | A2 transfer | ARC Eval §10 and §12 | Frozen A1 runs and manifests | Testing only a new best A2 system establishes transfer |
 | A3 science / competition | ARC Eval §11 and §13–19 | Current official scorer/rules snapshot when added | Public development score equals private/final SOTA |
-| Run interpretation | Preregistration + run manifest + evaluator output | ARC claim taxonomy and decision record | Aggregate score replaces per-task/per-environment outputs |
-| Publication / external claim | Formal report + decision record | PD, adjudication, ARC claim rules | Date, unit, resources, exposure, or verification can be omitted |
+| Run interpretation | Preregistration + run manifest + evaluator output | Relevant Domain Eval, then Project Eval claim rules and decision record | Aggregate score replaces per-task/per-environment outputs |
+| Publication / external claim | Formal report + decision record | PD, adjudication, relevant Domain Eval, and Project Eval claim rules | Date, unit, resources, exposure, or verification can be omitted |
 | State update | Responsible authoritative source + this file | Change log and downstream routes | `PROJECT-STATE.md` can change adjudication by itself |
 
 If a preregistration, manifest, evaluator output, report, or decision record is not in `docs/current/` or `docs/eval/`, mark it `Unavailable in project context` for GPT Chat Project work.
@@ -276,3 +281,4 @@ Every update must:
 | 2026-08-01 | v0.2 | Aligned document topology, authority, and task routing. | No empirical adjudication change |
 | 2026-08-01 | v0.3 | Removed short-lived repository/integration identity from current state and separated repository workflow from empirical state. | No empirical, ARC stage, or scope change |
 | 2026-08-02 | v0.4 | Reduced the state file to a high-value record and navigation layer; moved dataset/Toolkit details to ARC Dataset and Toolkit Status v0; recorded verified A1/A2 counts, A3 installation, offline smoke, and remote discovery; made current/eval the complete GPT Chat Project routing boundary. | Operational readiness updated. Empirical claim impact: none. ARC stage impact: none. Winning-hypothesis impact: none. |
+| 2026-08-05 | v0.5 | Added Project Evaluation Definition v0.1 as the project-level evaluation architecture between Problem Definition v1 and Domain Evaluation Definitions; updated authority and task routing. | Global experiment-design readiness remains `Not ready`. Empirical claim impact: none. ARC stage impact: none. Winning-hypothesis impact: none. |
