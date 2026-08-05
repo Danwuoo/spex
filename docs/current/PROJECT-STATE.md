@@ -1,12 +1,12 @@
 # PROJECT STATE
 
-- **State version:** v0.6
+- **State version:** v0.7
 - **Last updated:** 2026-08-05
 - **Evidence cutoff:** Evidence Base v1.1 / Evidence Adjudication v1; ARC external-source snapshot through 2026-07-31
 - **Operational snapshot:** ARC dataset and Toolkit checks through 2026-08-02
 - **Document role:** Primary project entrypoint, high-value state record, and source router. It does not replace the Problem Definition, project/domain evaluation definitions, evidence records, or adjudication.
-- **Current lifecycle:** Problem definition stabilized → evidence adjudicated → project-level evaluation architecture drafted → ARC evaluation specification drafted → ARC-AGI-1 Stage 0 substrate frozen
-- **Current operational stage:** ARC-AGI-1 Stage 0 substrate frozen. The local A1 canonical source, task manifest, rules snapshot, and public-exposure label are frozen; official scorer material remains unavailable, and governance/run infrastructure are not yet complete.
+- **Current lifecycle:** Problem definition stabilized → evidence adjudicated → project-level evaluation architecture drafted → ARC evaluation specification drafted → ARC-AGI-1 Stage 0 substrate recorded → Stage 1 local-reference evaluator core accepted, with a Stage 0 rules-manifest integrity conflict recorded
+- **Current operational stage:** ARC-AGI-1 Stage 1 local-reference evaluator core is accepted. The local A1 canonical source, task manifest, rules snapshot, strict task/prediction contract, and public-exposure label are recorded; direct validation now reports a pre-existing rules-manifest hash mismatch. Official scorer material remains unavailable, and governance/run infrastructure are not yet complete.
 - **Global experiment-design readiness:** `Not ready`
 - **ARC-specific design readiness:** `Draft for implementation`
 - **Project owner / decision authority:** `TBD`
@@ -61,7 +61,7 @@ ARC is the first controlled evaluation domain, not the full research problem. AR
 | Project Evaluation Definition v0.1 | Draft for project-level evaluation architecture | Cross-domain evaluation, comparison, aggregation, evidence-downgrade, falsification, and domain-inheritance rules are defined; this does not make global experiment design ready. |
 | Global experiment design | Not ready | Comparator, private-task, temporal, resource, and generalization controls remain incomplete. |
 | ARC Evaluation Definition v0.1 | Draft for implementation | Working ARC program exists, with unresolved implementation decisions and unmet v1 gates. |
-| Local ARC data and Toolkit | A1 Stage 0 frozen; other substrate available for implementation setup | A1 canonical source, task identity, local-reference rules, and public-exposure status are frozen; A2 public data, A3 imports, local smoke test, and remote discovery remain operational setup. |
+| Local ARC data and Toolkit | A1 Stage 0 artifacts recorded with a rules-manifest hash mismatch; Stage 1 local-reference evaluator core accepted; other substrate available for implementation setup | A1 canonical source, task identity, local-reference rules, strict evaluator contract, and public-exposure status are recorded. The evaluator remains non-official and not parity-validated. The Stage 0 validator currently reports `rules_snapshot_mismatch`; A2 public data, A3 imports, local smoke test, and remote discovery remain operational setup. |
 | ARC formal runs and stage achievements | Not evidenced | No formal preregistration, run manifest, official score, ablation, or stage-completion record is present. |
 
 ### 1.3 Evidence corpus index
@@ -89,7 +89,8 @@ Detailed records, status reasoning, counterexample scope, contradiction maps, an
 | Human-readable adjudication and readiness summary | [Evidence Adjudication v1 summary](./Evidence-Adjudication-v1.md) | Readable summary; workbook controls exact structured status |
 | ARC design, governance, metrics, stage gates, and claim taxonomy | [ARC Evaluation Definition v0](../eval/ARC-Eval-Definition-v0.md) | Highest authority for the ARC evaluation program |
 | Dataset inventory, Toolkit configuration, imports, environments, smoke test | [ARC Dataset and Toolkit Status v0](../eval/ARC-Dataset-Toolkit-Status-v0.md) | Operational setup record; not run evidence or empirical authority |
-| A1 canonical source, file manifest, local-reference policy snapshot, and query-log location | [ARC-AGI-1 Substrate v0](../eval/ARC-AGI-1-Substrate-v0.md) | Stage 0 operational identity record; not an official evaluator, score record, or empirical authority |
+| A1 canonical source, file manifest, local-reference policy snapshot, and query-log location | [ARC-AGI-1 Substrate v0](../eval/ARC-AGI-1-Substrate-v0.md) | Stage 0 operational identity record; its current rules-manifest hash validation conflict is recorded below; not an official evaluator, score record, or empirical authority |
+| A1 local-reference task/prediction/submission contract and scoring core | [ARC-AGI-1 Evaluator Core v0](../eval/ARC-AGI-1-Evaluator-Core-v0.md) | Stage 1 operational implementation record; not an official or parity-validated evaluator, score record, or empirical authority |
 | Project entrypoint and navigation | `PROJECT-STATE.md` | State index only; no independent empirical authority |
 
 ### 2.2 Authority rules
@@ -168,8 +169,8 @@ Research-qualified and benchmark-complete are separate outcomes. Public results 
 
 | Substrate | Directly observed status | Formal interpretation |
 |---|---|---|
-| A1 public training | 400 JSON files; canonical source and hashes frozen | Training tier only; see A1 Substrate v0 for the manifest and identity |
-| A1 public evaluation | 400 JSON files; canonical source and hashes frozen | `public-exposed` development/evaluation substrate only; not sealed or private |
+| A1 public training | 400 JSON files; manifest and rules snapshot are present, but current validator reports `rules_snapshot_mismatch` | Training tier only; see A1 Substrate v0 for the recorded manifest/identity and the integrity conflict. |
+| A1 public evaluation | 400 JSON files; manifest and rules snapshot are present, but current validator reports `rules_snapshot_mismatch` | `public-exposed` development/evaluation substrate only; not sealed or private. |
 | A2 public training | 1,000 JSON files available | Local data available; canonical snapshot/hash not frozen |
 | A2 public evaluation | 120 JSON files available | Public-exposed portion only; semi-private/private not established |
 | A3 root Toolkit | `arc-agi 0.9.9`; `arc_agi` and `arcengine` imports passed | Toolkit installation ready for implementation work |
@@ -192,8 +193,8 @@ See [ARC Dataset and Toolkit Status v0](../eval/ARC-Dataset-Toolkit-Status-v0.md
 
 | Work item | Status | Blocks |
 |---|---|---|
-| Pin A1 canonical repository/data snapshot and hashes | Complete (Stage 0) | Formal A1 run data identity and reproducibility |
-| Pin official parser, scorer, evaluator, and rules | Official material `Unavailable in checkout`; local-reference rules frozen | Official/parity-validated scores and cross-run comparison |
+| Validate A1 canonical repository/data snapshot and hashes | Directly observed conflict: Stage 0 validator reports `rules_snapshot_mismatch` for the unmodified manifest/rules pair | Formal A1 run data identity and reproducibility |
+| Pin official parser, scorer, evaluator, and rules | Official material `Unavailable in checkout`; local-reference core uses the actual rules-file hash, while Stage 0 manifest integrity remains conflicted | Official/parity-validated scores and cross-run comparison |
 | Define sealed validation, custodian, and evaluation firewall | TBD | Generalization and verified completion |
 | Implement run manifest, registry, output archive, and cost/deviation logging | Not evidenced | Attribution and reproducibility |
 | Calibrate Low/Matched/High compute tiers and seed policy | TBD | Resource-matched claims |
@@ -201,7 +202,7 @@ See [ARC Dataset and Toolkit Status v0](../eval/ARC-Dataset-Toolkit-Status-v0.md
 
 Shortest implementation sequence:
 
-1. Obtain/freeze official A1 evaluator material and sealed-governance decisions; retain the completed A1 data/rules identity freeze.
+1. Resolve or adjudicate the recorded A1 rules-manifest integrity conflict, then obtain/freeze official A1 evaluator material and sealed-governance decisions.
 2. Establish run, resource, cost, and output infrastructure.
 3. Execute `G0 → S1 → S2 → S3`; add `M1 → H1` only if model adaptation is in scope.
 4. Perform at least one key ablation, then issue a formal decision record before A2 transfer work.
@@ -214,8 +215,8 @@ Detailed metrics, baseline definitions, run-manifest fields, stage gates, unreso
 
 | Need | Durable artifact class |
 |---|---|
-| Data identity | Available: A1 canonical source/release pin, 800-file manifest, and hashes in A1 Substrate v0 |
-| Evaluator identity | Official parser/scorer/evaluator/submission-writer material `Unavailable in checkout`; local-reference rules snapshot available |
+| Data identity | A1 canonical source/release pin, 800-file manifest, and hashes are recorded in A1 Substrate v0, but the current validator reports an unresolved rules-manifest hash mismatch |
+| Evaluator identity | Official parser/scorer/evaluator/submission-writer material `Unavailable in checkout`; local-reference rules snapshot and Stage 1 evaluator core available, but non-official and not parity-validated. The Stage 0 manifest/rules hash mismatch remains unresolved. |
 | Governance | Sealed-validation protocol, access/custodian record, contamination/query ledger |
 | Run infrastructure | Machine-readable run-manifest schema, experiment registry, dependency lock/container |
 | Result trace | Per-task outputs, failed-run/deviation log, cost ledger |
@@ -242,6 +243,7 @@ These are implementation requirements, not evidence that any stage has failed or
 | ARC design / metrics / governance / stage gate | [ARC Evaluation Definition v0](../eval/ARC-Eval-Definition-v0.md) | Project Eval inheritance contract; PD minimum rules and relevant adjudicated gaps | ARC-only supports cross-domain or AGI conclusions |
 | Dataset counts / Toolkit / environments / configuration / smoke test | [ARC Dataset and Toolkit Status v0](../eval/ARC-Dataset-Toolkit-Status-v0.md) | Actual code/data only when executing in the repository | Installation equals evaluator or stage validation |
 | A1 implementation | ARC Eval §6–9, §13–19 | A1 Substrate v0, Dataset/Toolkit status, and new durable implementation artifacts | Current public data fills sealed/compute TBDs |
+| A1 evaluator core contract or local-reference score interpretation | [ARC-AGI-1 Evaluator Core v0](../eval/ARC-AGI-1-Evaluator-Core-v0.md) | ARC Eval §6–9; A1 Substrate v0 | Local-reference score is official or parity-validated |
 | A2 transfer | ARC Eval §10 and §12 | Frozen A1 runs and manifests | Testing only a new best A2 system establishes transfer |
 | A3 science / competition | ARC Eval §11 and §13–19 | Current official scorer/rules snapshot when added | Public development score equals private/final SOTA |
 | Run interpretation | Preregistration + run manifest + evaluator output | Relevant Domain Eval, then Project Eval claim rules and decision record | Aggregate score replaces per-task/per-environment outputs |
@@ -284,3 +286,4 @@ Every update must:
 | 2026-08-02 | v0.4 | Reduced the state file to a high-value record and navigation layer; moved dataset/Toolkit details to ARC Dataset and Toolkit Status v0; recorded verified A1/A2 counts, A3 installation, offline smoke, and remote discovery; made current/eval the complete GPT Chat Project routing boundary. | Operational readiness updated. Empirical claim impact: none. ARC stage impact: none. Winning-hypothesis impact: none. |
 | 2026-08-05 | v0.5 | Added Project Evaluation Definition v0.1 as the project-level evaluation architecture between Problem Definition v1 and Domain Evaluation Definitions; updated authority and task routing. | Global experiment-design readiness remains `Not ready`. Empirical claim impact: none. ARC stage impact: none. Winning-hypothesis impact: none. |
 | 2026-08-05 | v0.6 | Added ARC-AGI-1 Substrate v0: canonical repository identity, deterministic task manifest/hashes, local-reference rules snapshot, public-exposure labels, and development-query-log location. Official evaluator material remains `Unavailable in checkout`; sealed/private governance remains `TBD`. | Operational Stage 0 readiness updated. Empirical claim impact: none. ARC stage impact: none. Winning-hypothesis impact: none. |
+| 2026-08-05 | v0.7 | Added ARC-AGI-1 Evaluator Core v0: strict task/prediction contracts, solver-safe task view, deterministic local-reference scoring and submission envelope, diagnostics, schemas, and regression suite. Direct validation also found a pre-existing mismatch between the Stage 0 manifest's recorded rules SHA-256 and the unmodified rules file; no Stage 0 artifact was changed. Official evaluator material remains `Unavailable in checkout`; the local core is explicitly non-official and not parity-validated. | Operational Stage 1 implementation readiness updated; Stage 0 integrity conflict recorded. Empirical claim impact: none. ARC stage impact: none. Winning-hypothesis impact: none. |
