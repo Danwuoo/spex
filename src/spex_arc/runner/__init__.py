@@ -12,6 +12,7 @@ from .arc_a1 import (
     Solver,
     SolverFactory,
     TaskUsage,
+    release_usage,
     record_usage,
     validate_run_manifest,
 )
@@ -24,6 +25,7 @@ __all__ = [
     "Solver",
     "SolverFactory",
     "TaskUsage",
+    "release_usage",
     "record_usage",
     "validate_run_manifest",
 ]

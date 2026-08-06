@@ -114,7 +114,14 @@ class ArcA1RunnerTests(unittest.TestCase):
             model_id="exact-dummy-v1",
             model_snapshot="fixture-static",
             weights_hash="not-applicable-dummy",
-            prompt_policy_hash="not-applicable-dummy",
+            configuration_id="fixture-g0",
+            configuration_sha256="0" * 64,
+            provider_adapter_id="fixture-replay-v1",
+            provider_request_parameters={"temperature": 0},
+            provider_request_parameters_sha256="1" * 64,
+            prompt_policy={"kind": "fixture-minimal"},
+            prompt_policy_hash="2" * 64,
+            retry_policy={"max_retries": 0},
             solver_commit="test-fixture",
             training_data_manifest="not-used",
             synthetic_data_manifest="not-used",
@@ -254,6 +261,7 @@ class ArcA1RunnerTests(unittest.TestCase):
             flaky = FlakyDummySolver()
             manifest = replace(
                 self.manifest("retry", ("single",)),
+                retry_policy={"max_retries": 1},
                 budget=InferenceBudget(
                     num_attempts=1,
                     max_input_tokens=10,

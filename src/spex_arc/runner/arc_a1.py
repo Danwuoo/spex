@@ -41,7 +41,7 @@ from spex_arc.domain.arc_a1 import (
 from spex_arc.evaluator.arc_a1 import EvaluatorIdentity, LocalReferenceEvaluator, TaskScore
 
 
-RUN_MANIFEST_SCHEMA_VERSION = "1.0"
+RUN_MANIFEST_SCHEMA_VERSION = "1.1"
 RUN_MANIFEST_ARTIFACT_TYPE = "arc-agi-1-development-run"
 RUN_BUNDLE_ARTIFACT_TYPE = "arc-agi-1-development-run-bundle"
 RUN_MANIFEST_SCHEMA_PATH = Path(__file__).resolve().parents[3] / "schemas" / "arc-agi-1-run-manifest.schema.json"
@@ -59,7 +59,14 @@ _MANIFEST_REQUIRED_FIELDS = (
     "model_id",
     "model_snapshot",
     "weights_hash",
+    "configuration_id",
+    "configuration_sha256",
+    "provider_adapter_id",
+    "provider_request_parameters",
+    "provider_request_parameters_sha256",
+    "prompt_policy",
     "prompt_policy_hash",
+    "retry_policy",
     "solver_commit",
     "training_data_manifest",
     "synthetic_data_manifest",
@@ -201,7 +208,14 @@ class RunManifest:
     model_id: str
     model_snapshot: str
     weights_hash: str
+    configuration_id: str
+    configuration_sha256: str
+    provider_adapter_id: str
+    provider_request_parameters: Mapping[str, Any]
+    provider_request_parameters_sha256: str
+    prompt_policy: Mapping[str, Any]
     prompt_policy_hash: str
+    retry_policy: Mapping[str, Any]
     solver_commit: str
     training_data_manifest: str
     synthetic_data_manifest: str
@@ -232,6 +246,8 @@ class RunManifest:
             "benchmark": self.benchmark,
             "benchmark_snapshot": self.benchmark_snapshot,
             "concurrency_limit": self.budget.concurrency_limit,
+            "configuration_id": self.configuration_id,
+            "configuration_sha256": self.configuration_sha256,
             "contamination_status": self.contamination_status,
             "estimated_cost_usd": self.estimated_cost_usd,
             "evaluation_date": self.evaluation_date,
@@ -249,8 +265,13 @@ class RunManifest:
             "num_attempts": self.budget.num_attempts,
             "official_status": self.official_status,
             "parity_status": self.parity_status,
+            "prompt_policy": dict(self.prompt_policy),
             "prompt_policy_hash": self.prompt_policy_hash,
+            "provider_adapter_id": self.provider_adapter_id,
+            "provider_request_parameters": dict(self.provider_request_parameters),
+            "provider_request_parameters_sha256": self.provider_request_parameters_sha256,
             "random_seed": self.random_seed,
+            "retry_policy": dict(self.retry_policy),
             "result_status": self.result_status,
             "rules_sha256": self.rules_sha256,
             "rules_snapshot_id": self.rules_snapshot_id,
@@ -325,6 +346,10 @@ def validate_run_manifest(manifest: RunManifest, identity: EvaluatorIdentity) ->
         "model_id",
         "model_snapshot",
         "weights_hash",
+        "configuration_id",
+        "configuration_sha256",
+        "provider_adapter_id",
+        "provider_request_parameters_sha256",
         "prompt_policy_hash",
         "solver_commit",
         "training_data_manifest",
@@ -342,8 +367,17 @@ def validate_run_manifest(manifest: RunManifest, identity: EvaluatorIdentity) ->
     ):
         if not _is_nonempty_string(getattr(manifest, field_name)):
             failures.append(_failure("invalid_manifest_string", f"$.{field_name}", f"{field_name} must be a non-empty string."))
-    if len(manifest.rules_sha256) != 64 or any(character not in "0123456789abcdef" for character in manifest.rules_sha256):
-        failures.append(_failure("invalid_rules_hash", "$.rules_sha256", "rules_sha256 must be a lowercase SHA-256 hex digest."))
+    for field_name in ("configuration_sha256", "provider_request_parameters_sha256", "prompt_policy_hash", "rules_sha256"):
+        value = getattr(manifest, field_name)
+        if len(value) != 64 or any(character not in "0123456789abcdef" for character in value):
+            failures.append(_failure("invalid_sha256", f"$.{field_name}", f"{field_name} must be a lowercase SHA-256 hex digest."))
+    for field_name in ("provider_request_parameters", "prompt_policy", "retry_policy"):
+        value = getattr(manifest, field_name)
+        if not isinstance(value, Mapping):
+            failures.append(_failure("invalid_manifest_object", f"$.{field_name}", f"{field_name} must be a JSON object."))
+    retry_count = manifest.retry_policy.get("max_retries") if isinstance(manifest.retry_policy, Mapping) else None
+    if not _is_int(retry_count) or retry_count < 0:
+        failures.append(_failure("invalid_retry_policy", "$.retry_policy.max_retries", "retry_policy.max_retries must be a non-negative integer."))
     if not isinstance(manifest.estimated_cost_usd, (int, float)) or isinstance(manifest.estimated_cost_usd, bool) or not math.isfinite(manifest.estimated_cost_usd) or manifest.estimated_cost_usd < 0:
         failures.append(_failure("invalid_estimated_cost", "$.estimated_cost_usd", "estimated_cost_usd must be a non-negative finite number."))
 
@@ -503,6 +537,40 @@ class _UsageTracker:
             self._usage = proposed
         self._on_usage(previous, proposed)
 
+    def release(
+        self,
+        *,
+        input_tokens: int = 0,
+        output_tokens: int = 0,
+        estimated_cost_usd: float = 0.0,
+    ) -> None:
+        """Release an unused pre-request reservation after a provider response.
+
+        Adapters must reserve the upper bound before an external request.  A
+        response can then disclose smaller observed input/output usage or cost.
+        Calls and rollouts are never releasable because the external work has
+        already occurred.
+        """
+        values = {
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+        }
+        if any(not _is_int(value) or value < 0 for value in values.values()):
+            raise BudgetExceeded(_failure("invalid_usage_release", "$.usage", "Released token counts must be non-negative integers."))
+        if not isinstance(estimated_cost_usd, (int, float)) or isinstance(estimated_cost_usd, bool) or not math.isfinite(estimated_cost_usd) or estimated_cost_usd < 0:
+            raise BudgetExceeded(_failure("invalid_cost_release", "$.usage.estimated_cost_usd", "Released cost must be a non-negative finite number."))
+        with self._lock:
+            if input_tokens > self._usage.input_tokens or output_tokens > self._usage.output_tokens or float(estimated_cost_usd) > self._usage.estimated_cost_usd:
+                raise BudgetExceeded(_failure("usage_release_exceeds_reservation", "$.usage", "Adapter attempted to release more usage than was reserved."))
+            previous = self._usage
+            self._usage = self._usage.plus(
+                input_tokens=-input_tokens,
+                output_tokens=-output_tokens,
+                estimated_cost_usd=-float(estimated_cost_usd),
+            )
+            current = self._usage
+        self._on_usage(previous, current)
+
 
 _ACTIVE_USAGE_TRACKER: ContextVar[_UsageTracker | None] = ContextVar("spex_arc_active_usage_tracker", default=None)
 
@@ -530,6 +598,27 @@ def record_usage(
         output_tokens=output_tokens,
         model_calls=model_calls,
         rollouts=rollouts,
+        estimated_cost_usd=estimated_cost_usd,
+    )
+
+
+def release_usage(
+    *,
+    input_tokens: int = 0,
+    output_tokens: int = 0,
+    estimated_cost_usd: float = 0.0,
+) -> None:
+    """Settle unused pre-request provider reservations in the active task.
+
+    This may only reduce tokens or estimated cost reserved before a model call;
+    it cannot reduce model calls, rollouts, or solver invocations.
+    """
+    tracker = _ACTIVE_USAGE_TRACKER.get()
+    if tracker is None:
+        raise RuntimeError("release_usage() may be called only while ArcA1Runner invokes a solver.")
+    tracker.release(
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
         estimated_cost_usd=estimated_cost_usd,
     )
 
@@ -607,8 +696,19 @@ class _ArtifactStore:
             estimated_cost_usd=current.estimated_cost_usd - previous.estimated_cost_usd,
             wall_clock_seconds=current.wall_clock_seconds - previous.wall_clock_seconds,
         )
+        event_type = "usage_reserved" if all(
+            value >= 0
+            for value in (
+                delta.input_tokens,
+                delta.output_tokens,
+                delta.model_calls,
+                delta.rollouts,
+                delta.solver_invocations,
+                delta.estimated_cost_usd,
+            )
+        ) else "usage_released"
         self.append_event(
-            "usage_reserved",
+            event_type,
             attempt=attempt,
             task_id=task_id,
             usage_delta=delta.to_json(),
@@ -652,7 +752,7 @@ class _ArtifactStore:
             task_id = event.get("task_id")
             if not isinstance(task_id, str):
                 continue
-            if event.get("event_type") == "usage_reserved":
+            if event.get("event_type") in {"usage_reserved", "usage_released"}:
                 raw_delta = event.get("usage_delta")
                 if not isinstance(raw_delta, dict):
                     continue
@@ -695,7 +795,7 @@ class _ArtifactStore:
         for event in self._events:
             if event.get("task_id") != task_id:
                 continue
-            if event.get("event_type") == "usage_reserved" and isinstance(event.get("usage_delta"), dict):
+            if event.get("event_type") in {"usage_reserved", "usage_released"} and isinstance(event.get("usage_delta"), dict):
                 delta = _usage_from_json(event["usage_delta"])
             elif event.get("event_type") == "wall_clock_observed":
                 elapsed = event.get("elapsed_seconds")
@@ -920,6 +1020,8 @@ class ArcA1Runner:
             raise ValueError(f"Invalid run manifest: {[failure.to_json() for failure in manifest_result.failures]}")
         if not _is_int(self.max_retries) or self.max_retries < 0:
             raise ValueError("max_retries must be a non-negative integer.")
+        if self.max_retries != self.manifest.retry_policy["max_retries"]:
+            raise ValueError("Runner max_retries must match the frozen manifest retry_policy.max_retries.")
 
         tasks_by_id = self._index_tasks(tasks)
         selected = tuple(tasks_by_id[task_id] for task_id in self.manifest.task_ids)
