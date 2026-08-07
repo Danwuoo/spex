@@ -1,12 +1,13 @@
 # ARC-AGI-1 G0/S1 Development v0
 
-- **Version:** v0.1
-- **Date:** 2026-08-06
-- **Status:** Partially implemented Stage 3 development substrate; configured model calibration and paired ARC run blocked
+- **Version:** v0.2
+- **Date:** 2026-08-07
+- **Status:** Partially implemented Stage 3 development substrate with provider-independent policies approved; configured model calibration and paired ARC run blocked
 - **Scope:** Provider-independent fixed-backbone `G0` / `S1` contracts, disclosure binding, resource settlement, calibration proposal derivation, and paired task-level result reconstruction
 - **Document role:** Durable operational implementation record. It is not a provider approval, preregistration, formal run manifest, score report, decision record, official evaluator, sealed-evaluation protocol, or empirical adjudication.
 - **Authoritative evaluation definition:** [ARC Evaluation Definition v0](./ARC-Eval-Definition-v0.md) sections 5–9 and 13–18
 - **Implementation-stage source:** [ARC Evaluation Implementation Development Stages](../temp/ARC-Evaluation-Implementation-Development-Stages.md), Stage 3
+- **Current partial approval:** [ARC-AGI-1 Stage 3 Development Preregistration v0](./ARC-AGI-1-Stage-3-Development-Preregistration-v0.md)
 
 ## 1. Boundary and status
 
@@ -87,7 +88,9 @@ The fixture's intentional `G0`/`S1` outcome is a contract test only. It is not a
 
 ## 6. Remaining blockers and status impact
 
-The following authoritative decisions remain `TBD`: first fixed backbone/provider/model snapshot; approved model/API and external-tool policy; approved calibration task selection and query-log event; numerical `Low`/`Matched`/`High` tier policy; seed count and cost ceiling; formal preregistration; sealed governance; and official evaluator material. Executing a real adapter may incur paid external usage and must receive the required approval before it is configured or called.
+The Stage 3 development preregistration now approves the existing G0/S1 prompts, no-tool/single-task context and network boundary, zero retries, concurrency one, a twelve-task A1 training-tier calibration set, seed zero, one-call initial calibration, `1.00 / 1.25 / 2.00` budget-proposal multipliers, and the matched-pair policy. It does not authorize external execution.
+
+The following execution decisions remain `TBD`: first fixed backbone/provider/model snapshot; provider-specific request parameters; provider adapter and secure credential injection; input/output-token and wall-clock ceilings; per-task and total cost ceilings; derived numerical `Low`/`Matched`/`High` tiers; and resolution or formal adjudication of the Stage 0 rules-manifest conflict. Sealed governance and official evaluator material remain unavailable and continue to block official, verified, sealed, and generalization interpretations. Executing a real adapter may incur paid external usage and must receive a follow-up approval before it is configured or called.
 
 - **Empirical claim impact:** none.
 - **Evidence adjudication impact:** none.
@@ -99,3 +102,4 @@ The following authoritative decisions remain `TBD`: first fixed backbone/provide
 | Date | Version | Change | Status impact |
 |---|---|---|---|
 | 2026-08-06 | v0.1 | Added provider-independent G0/S1 solvers, frozen disclosure binding, manifest schema v1.1, pre-request resource reservation/settlement, calibration proposal derivation, paired task-level reconstruction, and regression coverage. | Tested implementation substrate only; no empirical, adjudication, or ARC stage-status change. |
+| 2026-08-07 | v0.2 | Linked the partial Stage 3 development approval and distinguished approved provider-independent policies from remaining external execution inputs. | No execution, empirical, adjudication, or ARC stage-status change. |
