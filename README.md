@@ -1,42 +1,56 @@
 # spex
 
-spex 目前結合 **專門化與通用模型比較的研究文件**，以及 **ARC-AGI-1 開發用的本地評分／run 工件基礎**。已實作 strict task/prediction contract、local-reference evaluator、run manifest／成本記錄與 G0/S1 的 provider-independent 介面；沒有設定或呼叫真實模型，也沒有正式 ARC 結果。[目前狀態來源](docs/current/PROJECT-STATE.md) 的 Stage 2 acceptance 是工程進度，不能當研究 stage achievement。
+spex 研究如何公平比較專門化與通用模型／系統，並以 ARC-AGI-1 建立第一套本地評估工程。Repository 包含研究問題、文獻證據與裁決工件，以及 strict task/prediction contracts、local-reference evaluator、run manifests、成本紀錄和 provider-independent G0/S1 介面。
 
-## 教授閱讀路線
+目前尚未設定或呼叫真實模型，也沒有正式 ARC benchmark 結果。完整狀態與來源路由見 [PROJECT-STATE](docs/current/PROJECT-STATE.md)。其中 Stage 2 acceptance 指開發用工程基礎，不代表研究 stage 或模型優勢已成立。
 
-1. [Professor-facing Repository Audit](PROFESSOR_AUDIT.md)：本次 checkout 準備度與公開前阻礙。
-2. [PROJECT-STATE](docs/current/PROJECT-STATE.md) → [Problem Definition v1](docs/current/Problem%20Definition%20v1.md)：研究問題與 G/M/S/H/N 等比較邊界。
-3. [Evidence Adjudication 摘要](docs/current/Evidence-Adjudication-v1.md)：文獻證據如何縮窄主張；精確 record-level 欄位以 [Evidence Base](docs/current/Evidence-Base-v1.1.xlsx) 與 [Adjudication workbook](docs/current/Evidence-Adjudication-v1.xlsx) 為準。
-4. [Evaluator Core](docs/eval/ARC-AGI-1-Evaluator-Core-v0.md) → [Run / Artifact Substrate](docs/eval/ARC-AGI-1-Run-Artifact-Substrate-v0.md) → [G0/S1 Development](docs/eval/ARC-AGI-1-G0-S1-Development-v0.md)：已存在程式與尚未完成的真實評估之間的邊界。
+## 兩條閱讀路線
 
-目前 evaluator 標為 `local-reference-non-official`，官方 scorer 仍 `Unavailable in checkout`，parity 尚未建立。Stage 0 有既知 `rules_snapshot_mismatch`；本次 clone 也沒有 [.gitignore](.gitignore) 排除的 `data/arc-datasets/`，歷史文件記錄的資料數量不等於本次資料可用。
+| 路線 | 入口 | 內容 |
+| --- | --- | --- |
+| 研究問題 | [Problem Definition v1](docs/current/Problem%20Definition%20v1.md) | 區分 generalist、model specialist、system specialist、hybrid 與 narrow/formal solver；拆開同 backbone 改善、frontier 優勢與持續優勢。 |
+| 證據與裁決 | [Evidence Adjudication 摘要](docs/current/Evidence-Adjudication-v1.md)、[Evidence Base](docs/current/Evidence-Base-v1.1.xlsx)、[Adjudication workbook](docs/current/Evidence-Adjudication-v1.xlsx) | 來源、反例、限制與主張狀態。精確 record-level 欄位以 workbook 為準；第三方文獻結果不是本庫自行訓練取得的結果。 |
+| 評估工程 | [Evaluator Core](docs/eval/ARC-AGI-1-Evaluator-Core-v0.md) → [Run / Artifact Substrate](docs/eval/ARC-AGI-1-Run-Artifact-Substrate-v0.md) → [G0/S1 Development](docs/eval/ARC-AGI-1-G0-S1-Development-v0.md) | 已實作的評分、失敗／成本紀錄、resume 與配對介面。 |
 
-## 可重現的本地檢查
+## 原碼導覽
 
-在 repo 根目錄使用 Python 與 Git。既有 fixture tests 使用 Python 標準函式庫，會在系統臨時目錄產生測試資料與 run 工件，不呼叫模型或讀取 ARC 公開資料集：
+```text
+task / solver view → model adapter → prediction contract
+                 → evaluator → run artifacts / resource ledger
+```
 
-```powershell
+| 入口 | 主要內容 |
+| --- | --- |
+| [domain/arc_a1.py](src/spex_arc/domain/arc_a1.py) | `Task.solver_view` 僅提供 test input；parser 保留結構化失敗。 |
+| [evaluator/arc_a1.py](src/spex_arc/evaluator/arc_a1.py) | Evaluator identity、`score_task`、submission serialization 與 exact scoring。 |
+| [runner/arc_a1.py](src/spex_arc/runner/arc_a1.py) | `RunManifest`、atomic artifact bundle、terminal task、resume 與資源紀錄。 |
+| [solvers/arc_a1.py](src/spex_arc/solvers/arc_a1.py)、[baselines/arc_a1.py](src/spex_arc/baselines/arc_a1.py) | `ModelAdapter.prepare/complete`、request reservation／settlement、配對條件與 calibration proposal。 |
+| [tests/](tests/) | Synthetic／replay fixtures、錯誤處理與重新啟動語意。 |
+
+## 最小離線檢查
+
+從 repository 根目錄使用 Python 與 Git 執行：
+
+```sh
 python -B -m unittest discover -s tests -p 'test_*.py' -v
 ```
 
-本次於 2026-10-11、Python 3.14.7 執行，18 項既有測試全數通過。這可核查 parser、scoring、budget、resume 與 pairing contracts；fixture 的成功輸出不是 benchmark 成績。
+既有 fixture tests 使用 Python 標準函式庫，在系統臨時目錄建立資料及 run artifacts，不呼叫模型或讀取公開 ARC task。Dummy solvers／ReplayAdapter 的預定輸出只檢查契約，不能當成 G0/S1 比較結果或模型能力證據。
 
-Stage 0 完整資料身分檢查的現有命令是：
+## 正式資料檢查與限制
 
-```powershell
+完整 Stage 0 身分檢查入口為：
+
+```sh
 python -B scripts/arc_a1_substrate.py validate
 ```
 
-本次此命令失敗：rules hash 不符、dataset repository／tier 目錄／800 個 manifest task files 缺失。資料來源與 frozen commit 可查 [Substrate v0](docs/eval/ARC-AGI-1-Substrate-v0.md)；取得相符來源及解決 hash 衝突前，不能宣稱完整 dataset 重現。`generate` 會覆寫 manifest，不是消除既有衝突的驗證步驟，本次未執行。
+執行前需要取得 [Substrate v0](docs/eval/ARC-AGI-1-Substrate-v0.md) 指定的外部資料與 frozen source；[.gitignore](.gitignore) 排除的 `data/arc-datasets/` 不隨一般 clone 提供。歷史 setup 記錄的 task 數量不表示目前本機已有資料。
 
-## 關鍵程式閱讀導覽
+[Rules](artifacts/arc-agi-1/rules.json) 與 [manifest](artifacts/arc-agi-1/manifest.json) 存在已記錄的 `rules_snapshot_mismatch`。資料缺失與規則身分衝突是不同問題；不要以 `generate` 覆寫 manifest 來消除原始衝突。未解決前不能將完整資料檢查視為通過。
 
-| 順序 | 入口 | 重點 |
-|---|---|---|
-| 1 | [domain/arc_a1.py](src/spex_arc/domain/arc_a1.py) | `Task.solver_view` 只提供 test input；parser 將失敗保留為結構化資料。 |
-| 2 | [evaluator/arc_a1.py](src/spex_arc/evaluator/arc_a1.py) | `load_evaluator_identity` → `score_task` → `serialize_submission`；Exact@1、native attempts 與 non-official 身分分開。 |
-| 3 | [runner/arc_a1.py](src/spex_arc/runner/arc_a1.py) | `RunManifest`／`validate_run_manifest` → `ArcA1Runner.run` → `_ArtifactStore`；terminal task、成本與中斷紀錄如何留下。 |
-| 4 | [solvers/arc_a1.py](src/spex_arc/solvers/arc_a1.py) 與 [baselines/arc_a1.py](src/spex_arc/baselines/arc_a1.py) | `ModelAdapter.prepare/complete`、request reservation／settlement、配對條件與 calibration proposal；尚無真實 provider。 |
-| 5 | [既有 tests](tests/) | 對照 fixture、錯誤與重啟語意，避免把工程測試當能力證據。 |
+Evaluator 目前標為 `local-reference-non-official`，官方 scorer 尚未提供，parity 尚未建立。正式 provider/model、sealed governance、數值 compute tiers 與 formal-run approvals 仍有缺口。ARC fixture 通過不支持 official score、OOD／跨版本泛化、specialist superiority 或跨領域／AGI 結論。
 
-本次僅加上閱讀入口與 audit，沒有修改程式、資料、規則或研究 adjudication。既有本人／AI／第三方的貢獻歸屬待確認；根目錄未找到 LICENSE，公開授權與第三方資料使用範圍仍需作者確認。
+## 文件與開發
+
+依 [AGENTS.md](AGENTS.md) 和 PROJECT-STATE 的 task-to-source routing 修改文件。README 不更動 Problem Definition、Evidence Adjudication、研究主張或 stage 狀態。Repository 目前未附 LICENSE；第三方資料與文獻工件的使用範圍需保持來源區分。
